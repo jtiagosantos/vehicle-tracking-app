@@ -6,3 +6,46 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model Route {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  source      Place
+  destination Place
+  distance    Float
+  duration    Float
+  directions  Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  RouteDriver RouteDriver[]
+
+  @@map("routes")
+}
+
+model RouteDriver {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  points    Point[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  route   Route  @relation(fields: [routeId], references: [id])
+  routeId String @unique @map("route_id") @db.ObjectId
+
+  @@map("routes_driver")
+}
+
+type Place {
+  name     String
+  location Coordinate
+}
+
+type Point {
+  location  Coordinate
+  createdAt DateTime   @default(now()) @map("created_at")
+}
+
+type Coordinate {
+  lat Float
+  lng Float
+}

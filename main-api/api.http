@@ -1,1 +1,25 @@
 GET http://localhost:3000
+
+###
+GET http://localhost:3000/routes
+
+###
+GET http://localhost:3000/routes/64e4171e26f89f5003b714a2
+
+###
+POST http://localhost:3000/routes
+Content-Type: application/json
+
+{
+  "name": "route test 2",
+  "sourceId": "ChIJ6cxzIkEZbJIRBO-L6Wbg7pg",
+  "destinationId": "ChIJgdzFlekbbJIR4qhmoi7CNEc"
+}
+
+### Map things
+
+### Get placeId 
+GET http://localhost:3000/places?text=69099200
+
+### Get directions between two points
+GET http://localhost:3000/directions?originId=ChIJ6cxzIkEZbJIRBO-L6Wbg7pg&destinationId=ChIJgdzFlekbbJIR4qhmoi7CNEc
