@@ -14,8 +14,8 @@ export class RoutesService {
   async create(createRouteDto: CreateRouteDto) {
     const { available_travel_modes, geocoded_waypoints, routes, request } =
       await this.directionsService.getDirections(
-        createRouteDto.sourceId,
-        createRouteDto.destinationId,
+        createRouteDto.sourceId.replace('place_id:', ''),
+        createRouteDto.destinationId.replace('place_id:', ''),
       );
     const legs = routes[0].legs[0];
 
