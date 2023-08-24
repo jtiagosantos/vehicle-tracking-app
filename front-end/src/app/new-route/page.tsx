@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import { Alert, Button, Card, CardActions, CardContent, List, ListItem, ListItemText, Snackbar, TextField, Typography } from "@mui/material";
 import type { FormEvent } from 'react';
 import type { 
   DirectionsResponseData, 
   FindPlaceFromTextResponseData,
 } from '@googlemaps/google-maps-services-js';
+
 import { useMap } from '../../hooks/use-map';
 
 export default function NewRoutePage() {
@@ -14,6 +17,7 @@ export default function NewRoutePage() {
   const [directionsData, setDirectionsData] = useState<
     DirectionsResponseData & { request: any }
   >();
+  const [open, setOpen] = useState(false);
 
   const handleSearchPlaces = async (event: FormEvent) => {
     event.preventDefault();
@@ -22,8 +26,8 @@ export default function NewRoutePage() {
     const destination = (document.getElementById('destination') as HTMLInputElement).value;
 
     const [sourceResponse, destinationResponse] = await Promise.all([
-      fetch(`http://localhost:3000/places?text=${source}`),
-      fetch(`http://localhost:3000/places?text=${destination}`),
+      fetch(`http://localhost:3333/api/places?text=${source}`),
+      fetch(`http://localhost:3333/api/places?text=${destination}`),
     ]);
 
     const [sourcePlace, destinationPlace]: FindPlaceFromTextResponseData[] = await Promise.all([
@@ -47,7 +51,7 @@ export default function NewRoutePage() {
     const placeDestinationId = destinationPlace.candidates[0].place_id;
 
     const directionsResponse = await fetch(
-      `http://localhost:3000/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`
+      `http://localhost:3333/api/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`
     );
     const directionsData: DirectionsResponseData & { request: any } = await directionsResponse.json();
 
@@ -73,7 +77,7 @@ export default function NewRoutePage() {
     const startAddress = directionsData!.routes[0].legs[0].start_address;
     const endAddress = directionsData!.routes[0].legs[0].end_address;
 
-    const response = await fetch('http://localhost:3000/routes', {
+    const response = await fetch('http://localhost:3333/api/routes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -84,53 +88,84 @@ export default function NewRoutePage() {
         destinationId: directionsData!.request.destination.place_id,
       })
     });
-    const route = await response.json();
+    await response.json();
+    
+    setOpen(true);
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      height: '100%',
-      width: '100%',
-    }}>
-      <div>
-        <h1>Nova rota</h1>
-
-        <form 
-          style={{
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-          onSubmit={handleSearchPlaces}
-        >
-          <div>
-            <input id="source" type="text" placeholder="origem" />
-          </div>
-          <div>
-            <input id="destination" type="text" placeholder="destino" />
-          </div>
-          <button>Pesquisar</button>
+    <Grid2 container sx={{ display: "flex", flex: 1 }}>
+      <Grid2 xs={4} px={2}>
+        <Typography variant="h4" marginTop={2} marginBottom={1}>Nova rota</Typography>
+        <form onSubmit={handleSearchPlaces}>
+          <TextField id="source" label="Origem" fullWidth />
+          <TextField
+            id="destination"
+            label="Destino"
+            fullWidth
+            sx={{ mt: 1 }}
+          />
+          <Button variant="contained" type="submit" sx={{ mt: 1 }} fullWidth>
+            Pesquisar
+          </Button>
         </form>
-
-        {!!directionsData && (
-          <ul>
-            <li>Origem {directionsData.routes[0].legs[0].start_address}</li>
-            <li>Destino {directionsData.routes[0].legs[0].end_address}</li>
-            <li>
-              <button onClick={handleCreateRoute}>Criar rota</button>
-            </li>
-          </ul>
+        {directionsData && (
+          <Card sx={{ mt: 2 }}>
+            <CardContent>
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary={"Origem"}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.start_address
+                    }
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={"Destino"}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.end_address
+                    }
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={"Distância"}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.distance.text
+                    }
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={"Duração"}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.duration.text
+                    }
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+            <CardActions sx={{ display: "flex", justifyContent: "center" }}>
+              <Button type="button" variant="contained" onClick={handleCreateRoute}>
+                Adicionar rota
+              </Button>
+            </CardActions>
+          </Card>
         )}
-      </div>
-      <div 
-        id="map" 
-        style={{
-          height: '100%',
-          width: '100%',
-        }}
-        ref={mapContainerRef}
-      />
-    </div>
+      </Grid2>
+      <Grid2 id="map" xs={8} ref={mapContainerRef}></Grid2>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={() => setOpen(false)}
+        
+      >
+        <Alert onClose={() => setOpen(false)} severity="success">
+          Rota cadastrada com sucesso
+        </Alert>
+      </Snackbar>
+    </Grid2>
   );
 }

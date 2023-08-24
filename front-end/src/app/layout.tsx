@@ -1,7 +1,6 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import './globals.css';
+import ThemeRegistry from '../components/theme-registry/theme-registry';
+import { Navbar } from '../components/navbar';
 
 export default function RootLayout({
   children,
@@ -10,7 +9,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <ThemeRegistry>
+          <Navbar />
+          {children}
+        </ThemeRegistry>
+      </body>
     </html>
   )
 }
