@@ -4,14 +4,21 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { RoutesModule } from './modules/routes/routes.module';
-import { MapsModule } from './modules/maps/maps.module';
+import { BullModule } from '@nestjs/bull';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    BullModule.forRoot({
+      redis: {
+        host: 'redis',
+        port: 6379,
+      },
+    }),
     RoutesModule,
-    MapsModule,
+    PrometheusModule.register()
   ],
   controllers: [AppController],
   providers: [AppService],

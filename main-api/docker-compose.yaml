@@ -7,6 +7,8 @@ services:
       - "3000:3000"
     volumes:
       - .:/home/node/app
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
   db:
     image: bitnami/mongodb:5.0.17
@@ -17,6 +19,11 @@ services:
       MONGODB_REPLICA_SET_MODE: primary
       MONGODB_REPLICA_SET_KEY: 123456
       MONGODB_DATABASE: nest
+
+  redis:
+    image: redis:7.0.8-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   mongodb_data:
