@@ -63,7 +63,7 @@ func (r *RouteRepositoryMySQL) FindByID(id string) (*entity.Route, error) {
 
 func (r *RouteRepositoryMySQL) Update(route *entity.Route) error {
 	startedAt := route.StartedAt.Format("2006-01-02 15:04:05")
-	finishedAt := route.StartedAt.Format("2006-01-02 15:04:05")
+	finishedAt := route.FinishedAt.Format("2006-01-02 15:04:05")
 
 	sql := "UPDATE routes SET status = ?, shipping_price = ?, started_at=?, finished_at = ? WHERE id = ?"
 
