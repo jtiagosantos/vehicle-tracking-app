@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { RoutesModule } from './modules/routes/routes.module';
 import { BullModule } from '@nestjs/bull';
@@ -18,9 +16,9 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       },
     }),
     RoutesModule,
-    PrometheusModule.register()
+    PrometheusModule.register(),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
